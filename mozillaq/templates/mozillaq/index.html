@@ -1,0 +1,81 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<style type="text/css">
+			#results {
+				background-color: ghostwhite;
+				border: 1px solid silver;
+				padding: 10px 20px;
+				margin: 20px;
+				white-space: pre;
+				font-family: monospace;
+			}
+			.json-key {
+				color: brown;
+			}
+			.json-value {
+				color: navy;
+			}
+			.json-string {
+				color: olive;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Mozilla quiz backend app root</h1>
+		<h2>Test queries</h2>
+		<ul id="jsonList">
+			<li><a href="questions">Questions</a></li>
+		</ul>
+		<h2>Results</h2>
+		<div id="results">
+
+		</div>
+		<script type="text/javascript">
+			(function() {
+				var anchors = document.querySelectorAll('#jsonList li a');
+				for (var i = 0; i < anchors.length; i++) {
+					(function (anchor) {
+						anchor.addEventListener('click', function (event) {
+							event.preventDefault();
+							var xhr = new XMLHttpRequest();
+							xhr.open('get', this.href);
+							xhr.onreadystatechange = function () {
+								if (xhr.readyState === 4 && xhr.status === 200) {
+									showResult(JSON.parse(xhr.responseText))
+							}
+						}
+							xhr.send();
+						});
+					})(anchors[i]);
+				}
+			})();
+
+			function showResult(object) {
+				var results = document.getElementById('results');
+				results.innerHTML = prettyPrint(object);
+
+				function replacer(match, pIndent, pKey, pVal, pEnd) {
+					var key = '<span class="json-key">';
+					var val = '<span class="json-value">';
+					var str = '<span class="json-string">';
+					var r = pIndent || '';
+					if (pKey)
+						r = r + key + pKey.replace(/[": ]/g, '') + '</span>: ';
+					if (pVal)
+						r = r + (pVal[0] == '"' ? str : val) + pVal + '</span>';
+					return r + (pEnd || '');
+				}
+
+				function prettyPrint(obj) {
+					var jsonLine = /^( *)("[\w]+": )?("[^"]*"|[\w.+-]*)?([,[{])?$/mg;
+					return JSON.stringify(obj, null, 3)
+						.replace(/&/g, '&amp;').replace(/\\"/g, '&quot;')
+						.replace(/</g, '&lt;').replace(/>/g, '&gt;')
+						.replace(jsonLine, replacer);
+				}
+			}
+		</script>
+	</body>
+</html>

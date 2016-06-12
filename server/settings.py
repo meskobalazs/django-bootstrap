@@ -41,6 +41,7 @@ CORE_APPS = (
 
 USER_APPS = (
     'main',
+    'mozillaq'
 )
 
 INSTALLED_APPS = CORE_APPS + USER_APPS
